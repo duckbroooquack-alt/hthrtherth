@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет — LUSTRO{% endblock %}
+
+{% block content %}
+<div class="stats-4">
+    <div class="mc-panel">
+        <div class="stat-val">#{{ '%04d' % g.user.id }}</div>
+        <div class="stat-lbl">Ваш UID</div>
+    </div>
+    <div class="mc-panel">
+        <div class="stat-val" style="font-size:15px;">{{ g.user.username }}</div>
+        <div class="stat-lbl">Никнейм</div>
+    </div>
+    <div class="mc-panel-gold">
+        <div class="stat-val" style="font-size:14px; color:{{ SUBSCRIPTION_PLANS[g.plan].color }};">
+            {{ SUBSCRIPTION_PLANS[g.plan].name }}
+        </div>
+        <div class="stat-lbl">
+            {% if g.plan_until %}До: {{ g.plan_until }}{% else %}Базовый доступ{% endif %}
+        </div>
+    </div>
+    <div class="mc-panel">
+        <div class="stat-val">{{ my_downloads|length }}</div>
+        <div class="stat-lbl">Ваших загрузок</div>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:36px;">
+    <section class="mc-panel">
+        <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:18px;">СКАЧАТЬ КЛИЕНТ</h2>
+        {% if builds %}
+            {% for b in builds %}
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 0; border-bottom:2px solid #141418;">
+                    <div>
+                        <strong>Lustro {{ b.version }}</strong>
+                        {% if b.min_plan != 'free' %}
+                            <span class="badge badge-gold">{{ SUBSCRIPTION_PLANS[b.min_plan].name }}</span>
+                        {% endif %}
+                        <div style="font-size:14px; color:var(--muted);">
+                            MC {{ b.mc_version }} · {{ b.file_size }} · {{ b.uploaded_at }}
+                        </div>
+                    </div>
+                    <a href="{{ url_for('download', build_id=b.id) }}" class="mc-btn mc-btn-gold mc-btn-sm">⬇ Скачать</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:var(--muted);">Администратор ещё не загрузил файлы клиента.</p>
+        {% endif %}
+    </section>
+
+    <div style="display:flex; flex-direction:column; gap:22px;">
+        <section class="mc-panel-gold">
+            <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:14px;">АКТИВАЦИЯ КЛЮЧА ПОДПИСКИ</h2>
+            <p style="color:var(--muted); font-size:15px; margin-bottom:14px;">
+                Есть ключ от администратора? Введи его ниже, чтобы мгновенно получить подписку.
+            </p>
+            <form method="POST">
+                <input type="hidden" name="form_type" value="redeem_key">
+                <div class="form-group">
+                    <input type="text" name="promo_code" class="mc-input mono" required placeholder="LUSTRO-XXXX-XXXX-XXXX">
+                </div>
+                <button type="submit" class="mc-btn mc-btn-gold mc-btn-sm">Активировать ключ</button>
+            </form>
+        </section>
+
+        <section class="mc-panel">
+            <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:14px;">СМЕНА ПАРОЛЯ</h2>
+            <form method="POST">
+                <input type="hidden" name="form_type" value="password">
+                <div class="form-group">
+                    <label>Текущий пароль</label>
+                    <input type="password" name="old_password" class="mc-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль (от 8 символов)</label>
+                    <input type="password" name="new_password" class="mc-input" required minlength="8">
+                </div>
+                <button type="submit" class="mc-btn mc-btn-stone mc-btn-sm">Сохранить пароль</button>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}

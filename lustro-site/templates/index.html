@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <div class="mc-tag">
+            {% if latest_build %}
+                АКТУАЛЬНЫЙ БИЛД: {{ latest_build.version }} · MC {{ latest_build.mc_version }}
+            {% else %}
+                MINECRAFT 1.16.5 — 1.21.4 · ЗОЛОТОЕ ИЗДАНИЕ
+            {% endif %}
+        </div>
+
+        <h1>ИГРАЙ НА МАКСИМУМЕ С <span>LUSTRO</span></h1>
+
+        <p class="hero-text">
+            Быстрый Minecraft-клиент без лишнего мусора: стабильный FPS в замесах,
+            удобное модульное меню, профили под популярные серверы и защищённая система обновлений.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{{ url_for('download') }}" class="mc-btn mc-btn-gold">
+                ⬇ {% if latest_build %}Скачать {{ latest_build.version }}{% else %}Скачать клиент{% endif %}
+            </a>
+            <a href="{{ url_for('subscriptions') }}" class="mc-btn mc-btn-stone">
+                ★ Подписки (в разработке)
+            </a>
+        </div>
+
+        <div class="stats-strip">
+            <div class="stat-block">
+                <div class="stat-val">{{ display_users }}+</div>
+                <div class="stat-lbl">Игроков в базе</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-val">{{ display_downloads }}+</div>
+                <div class="stat-lbl">Загрузок клиента</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-val">{{ display_builds }}</div>
+                <div class="stat-lbl">Выпущено билдов</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Интерактивный Minecraft-инвентарь модулей -->
+    <div class="mc-panel-gold">
+        <div class="inv-header">
+            <span class="pixel-title" style="font-size:12px; color:var(--gold);">LUSTRO MODS MENU</span>
+            <span id="active-modules-count" class="badge badge-green">4 / 6 ВКЛ</span>
+        </div>
+
+        <div class="inv-grid">
+            <div class="inv-slot active"
+                 data-title="FPS Booster [Оптимизация]"
+                 data-lore="Асинхронный рендер чанков и очистка мусора в памяти. Убирает микрофризы на слабых ПК.">
+                <svg width="28" height="28" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="7" y="1" width="4" height="3" fill="#fef08a"/>
+                    <rect x="5" y="4" width="5" height="3" fill="#facc15"/>
+                    <rect x="4" y="7" width="8" height="3" fill="#eab308"/>
+                    <rect x="6" y="10" width="4" height="3" fill="#facc15"/>
+                    <rect x="5" y="13" width="3" height="2" fill="#a16207"/>
+                </svg>
+                <div class="slot-name">FPS Boost</div>
+                <div class="slot-state">[ВКЛ]</div>
+            </div>
+
+            <div class="inv-slot active"
+                 data-title="Keystrokes HUD [Интерфейс]"
+                 data-lore="Показывает нажатия WASD, ЛКМ/ПКМ и счётчик CPS прямо на экране в золотой теме.">
+                <svg width="28" height="28" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="5" y="2" width="6" height="5" fill="#facc15"/>
+                    <rect x="1" y="8" width="4" height="5" fill="#d4d4d8"/>
+                    <rect x="6" y="8" width="4" height="5" fill="#facc15"/>
+                    <rect x="11" y="8" width="4" height="5" fill="#d4d4d8"/>
+                </svg>
+                <div class="slot-name">Keystrokes</div>
+                <div class="slot-state">[ВКЛ]</div>
+            </div>
+
+            <div class="inv-slot active"
+                 data-title="ToggleSprint [Движение]"
+                 data-lore="Автоматический бег без зажатия Ctrl. Незаменимо для PvP, BedWars и SkyWars.">
+                <svg width="28" height="28" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="5" y="3" width="5" height="6" fill="#eab308"/>
+                    <rect x="3" y="9" width="10" height="4" fill="#facc15"/>
+                    <rect x="3" y="12" width="10" height="2" fill="#a16207"/>
+                </svg>
+                <div class="slot-name">AutoSprint</div>
+                <div class="slot-state">[ВКЛ]</div>
+            </div>
+
+            <div class="inv-slot active"
+                 data-title="Armor & Potion HUD [Бой]"
+                 data-lore="Отображает прочность брони и таймеры зелий без открытия инвентаря.">
+                <svg width="28" height="28" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="3" y="2" width="10" height="3" fill="#facc15"/>
+                    <rect x="2" y="5" width="12" height="6" fill="#eab308"/>
+                    <rect x="4" y="11" width="8" height="3" fill="#a16207"/>
+                </svg>
+                <div class="slot-name">ArmorHUD</div>
+                <div class="slot-state">[ВКЛ]</div>
+            </div>
+
+            <div class="inv-slot"
+                 data-title="Fullbright [Освещение]"
+                 data-lore="Идеальная видимость в пещерах, шахтах и ночных замесах без факелов.">
+                <svg width="28" height="28" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="6" y="2" width="4" height="4" fill="#fef08a"/>
+                    <rect x="6" y="6" width="4" height="8" fill="#92400e"/>
+                </svg>
+                <div class="slot-name">Fullbright</div>
+                <div class="slot-state">[ВЫКЛ]</div>
+            </div>
+
+            <div class="inv-slot"
+                 data-title="Zoom + Crosshair [Рендер]"
+                 data-lore="Плавное приближение камеры по клавише C и конструктор кастомного прицела.">
+                <svg width="28" height="28" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="7" y="2" width="2" height="4" fill="#facc15"/>
+                    <rect x="7" y="10" width="2" height="4" fill="#facc15"/>
+                    <rect x="2" y="7" width="4" height="2" fill="#facc15"/>
+                    <rect x="10" y="7" width="4" height="2" fill="#facc15"/>
+                    <rect x="7" y="7" width="2" height="2" fill="#fff"/>
+                </svg>
+                <div class="slot-name">Zoom+</div>
+                <div class="slot-state">[ВЫКЛ]</div>
+            </div>
+        </div>
+
+        <div class="mc-tooltip">
+            <div id="mc-tip-title" class="mc-tooltip-title">FPS Booster [Оптимизация]</div>
+            <div id="mc-tip-lore" class="mc-tooltip-lore">Наведи или кликни по любому слоту выше, чтобы включить/выключить модуль.</div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="section">
+    <div class="section-heading">
+        <h2>ПОЧЕМУ ВЫБИРАЮТ LUSTRO</h2>
+        <span class="badge badge-gold">СДЕЛАНО ДЛЯ ИГРОКОВ</span>
+    </div>
+
+    <div class="features-grid">
+        <div class="mc-panel">
+            <div class="feature-head">
+                <svg width="26" height="26" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="2" y="2" width="12" height="12" fill="#facc15"/>
+                    <rect x="5" y="5" width="6" height="6" fill="#181002"/>
+                </svg>
+                <h3>Чистая оптимизация</h3>
+            </div>
+            <p class="feature-desc">Сниженное потребление ОЗУ и быстрая прогрузка чанков — игра не фризит даже на загруженных спавнах.</p>
+        </div>
+
+        <div class="mc-panel">
+            <div class="feature-head">
+                <svg width="26" height="26" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="3" y="2" width="10" height="12" fill="#eab308"/>
+                    <rect x="5" y="5" width="6" height="2" fill="#181002"/>
+                    <rect x="5" y="9" width="6" height="2" fill="#181002"/>
+                </svg>
+                <h3>Профили конфигов</h3>
+            </div>
+            <p class="feature-desc">Отдельные пресеты для FunTime, ReallyWorld, HolyWorld и Hypixel с переключением за 1 клик.</p>
+        </div>
+
+        <div class="mc-panel">
+            <div class="feature-head">
+                <svg width="26" height="26" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect x="4" y="2" width="8" height="4" fill="#a16207"/>
+                    <rect x="2" y="6" width="12" height="8" fill="#facc15"/>
+                    <rect x="7" y="9" width="2" height="3" fill="#181002"/>
+                </svg>
+                <h3>Безопасный доступ</h3>
+            </div>
+            <p class="feature-desc">Прямое скачивание только через проверенный аккаунт на сайте без рекламы и сторонних обменников.</p>
+        </div>
+    </div>
+</section>
+
+<section id="fps" class="section">
+    <div class="mc-panel">
+        <div class="section-heading" style="margin-bottom:18px;">
+            <h2>ТЕСТ ПРОИЗВОДИТЕЛЬНОСТИ (FPS)</h2>
+            <span class="badge badge-green">16 ЧАНКОВ · FANCY</span>
+        </div>
+
+        <div class="xp-row">
+            <div class="xp-meta"><span>Vanilla Minecraft</span><span>115 FPS</span></div>
+            <div class="xp-bar"><div class="xp-fill gray" style="width:22%;"></div></div>
+        </div>
+        <div class="xp-row">
+            <div class="xp-meta"><span>OptiFine</span><span>280 FPS</span></div>
+            <div class="xp-bar"><div class="xp-fill" style="width:48%;"></div></div>
+        </div>
+        <div class="xp-row" style="margin-bottom:0;">
+            <div class="xp-meta"><span style="color:var(--gold);">Lustro Client</span><span style="color:var(--gold);">630+ FPS</span></div>
+            <div class="xp-bar"><div class="xp-fill gold" style="width:96%;"></div></div>
+        </div>
+    </div>
+</section>
+
+{% if recent_builds %}
+<section id="changelog" class="section">
+    <div class="section-heading">
+        <h2>ПОСЛЕДНИЕ БИЛДЫ</h2>
+        <a href="{{ url_for('profile') }}" class="mc-btn mc-btn-stone mc-btn-sm">Все версии в кабинете</a>
+    </div>
+
+    <div class="mc-panel-gold">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+            <div>
+                <span class="pixel-title" style="font-size:14px; color:var(--gold);">Lustro {{ latest_build.version }}</span>
+                <span class="badge" style="margin-left:8px;">MC {{ latest_build.mc_version }}</span>
+                <span class="badge badge-gold" style="margin-left:4px;">{{ latest_build.file_size }}</span>
+            </div>
+            <a href="{{ url_for('download', build_id=latest_build.id) }}" class="mc-btn mc-btn-gold mc-btn-sm">
+                ⬇ Скачать {{ latest_build.version }}
+            </a>
+        </div>
+        {% if latest_build.changelog %}
+            <pre class="mono" style="background:#101014; padding:14px; border:2px solid #000; color:#d4d4d8; white-space:pre-wrap; font-size:13px;">{{ latest_build.changelog }}</pre>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<section id="faq" class="section">
+    <div class="section-heading">
+        <h2>ЧАСТЫЕ ВОПРОСЫ</h2>
+    </div>
+
+    <div class="mc-panel">
+        <div class="faq-item open">
+            <button class="faq-btn">Как скачать клиент Lustro? <span>+</span></button>
+            <div class="faq-ans">Зарегистрируйся с настоящей почтой, пройди пиксельную капчу и нажми «Скачать» на главной или в личном кабинете.</div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-btn">Как получить подписку LUSTRO+ или ULTRA? <span>+</span></button>
+            <div class="faq-ans">Автоматическая оплата сейчас находится в разработке. Администратор может выдать подписку вручную или выдать тебе ключ активации вида LUSTRO-XXXX-XXXX-XXXX для ввода в личном кабинете.</div>
+        </div>
+        <div class="faq-item" style="margin-bottom:0;">
+            <button class="faq-btn">Какие версии Minecraft поддерживаются? <span>+</span></button>
+            <div class="faq-ans">Клиент поддерживает линейку версий от 1.16.5 до 1.21.4 (зависит от выбранного билда в личном кабинете).</div>
+        </div>
+    </div>
+</section>
+{% endblock %}

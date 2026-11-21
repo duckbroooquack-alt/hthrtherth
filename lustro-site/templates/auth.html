@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Вход и регистрация — LUSTRO{% endblock %}
+
+{% block content %}
+<div class="mc-panel-gold auth-box">
+    <div class="tabs">
+        <a href="{{ url_for('auth', mode='login') }}"
+           class="mc-btn {% if mode == 'login' %}mc-btn-gold{% else %}mc-btn-stone{% endif %} mc-btn-sm">
+            Вход
+        </a>
+        <a href="{{ url_for('auth', mode='register') }}"
+           class="mc-btn {% if mode == 'register' %}mc-btn-gold{% else %}mc-btn-stone{% endif %} mc-btn-sm">
+            Регистрация
+        </a>
+    </div>
+
+    {% if mode == 'register' %}
+        <form method="POST">
+            <input type="hidden" name="action" value="register">
+
+            <div class="form-group">
+                <label>Игровой никнейм (латиница, 3–20 символов)</label>
+                <input type="text" name="username" class="mc-input" required minlength="3" maxlength="20" placeholder="Steve_2026">
+            </div>
+
+            <div class="form-group">
+                <label>Настоящий Email (проверяется домен)</label>
+                <input type="email" id="reg-email" name="email" class="mc-input" required placeholder="player@gmail.com">
+                <div id="email-status" class="email-status"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Пароль (от 8 символов)</label>
+                <input type="password" name="password" class="mc-input" required minlength="8" placeholder="Минимум 8 символов">
+            </div>
+
+            <div class="form-group">
+                <label>Повторите пароль</label>
+                <input type="password" name="confirm_password" class="mc-input" required minlength="8" placeholder="Повторите пароль">
+            </div>
+
+            <div class="form-group">
+                <label>Капча (защита от ботов)</label>
+                <div class="captcha-row">
+                    <img id="captcha-img" src="{{ url_for('captcha_svg') }}" alt="Капча" class="captcha-img" title="Нажми, чтобы обновить">
+                    <button type="button" id="captcha-refresh" class="mc-btn mc-btn-stone mc-btn-sm">↻ Обновить</button>
+                </div>
+                <input type="text" name="captcha" class="mc-input mono" required maxlength="5" autocomplete="off" placeholder="Введите 5 символов с картинки">
+            </div>
+
+            <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">Создать аккаунт</button>
+        </form>
+    {% else %}
+        <form method="POST">
+            <input type="hidden" name="action" value="login">
+
+            <div class="form-group">
+                <label>Никнейм или Email</label>
+                <input type="text" name="username" class="mc-input" required placeholder="Введите логин">
+            </div>
+
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" name="password" class="mc-input" required placeholder="Введите пароль">
+            </div>
+
+            <div class="form-group">
+                <label>Капча</label>
+                <div class="captcha-row">
+                    <img id="captcha-img" src="{{ url_for('captcha_svg') }}" alt="Капча" class="captcha-img" title="Нажми, чтобы обновить">
+                    <button type="button" id="captcha-refresh" class="mc-btn mc-btn-stone mc-btn-sm">↻ Обновить</button>
+                </div>
+                <input type="text" name="captcha" class="mc-input mono" required maxlength="5" autocomplete="off" placeholder="Введите 5 символов с картинки">
+            </div>
+
+            <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">Войти в аккаунт</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

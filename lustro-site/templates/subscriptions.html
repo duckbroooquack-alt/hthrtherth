@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Подписки — LUSTRO Client{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-heading">
+        <h2>ПОДПИСКИ LUSTRO</h2>
+        <span class="badge badge-gold">СИСТЕМА ОПЛАТЫ В РАЗРАБОТКЕ</span>
+    </div>
+
+    <div class="dev-banner">
+        <strong>[В РАЗРАБОТКЕ]</strong> Автоматическая оплата подписок скоро откроется!
+        Сейчас подписки <strong>LUSTRO+</strong>, <strong>ULTRA</strong> и <strong>LIFETIME</strong>
+        выдаются напрямую администратором или активируются по ключу в
+        <a href="{{ url_for('profile') }}" style="color:var(--gold);">личном кабинете</a>.
+    </div>
+
+    <div class="plans-grid">
+        {% for key, plan in SUBSCRIPTION_PLANS.items() %}
+        <div class="{% if key == 'plus' %}mc-panel-gold{% else %}mc-panel{% endif %} plan-card">
+            <div>
+                <div class="plan-name" style="color: {{ plan.color }};">{{ plan.name }}</div>
+                <div class="plan-price">{{ plan.price }}</div>
+                <ul class="plan-list">
+                    {% for feat in plan.features %}
+                        <li>{{ feat }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                {% if g.user and g.plan == key %}
+                    <button class="mc-btn mc-btn-gold" style="width:100%;" disabled>✓ Ваш текущий тариф</button>
+                {% elif key == 'free' %}
+                    <a href="{{ url_for('download') }}" class="mc-btn mc-btn-stone" style="width:100%;">Скачать бесплатно</a>
+                {% else %}
+                    <button class="mc-btn mc-btn-disabled" style="width:100%;" disabled>Оплата в разработке</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

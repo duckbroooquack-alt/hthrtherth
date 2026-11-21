@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% block title %}Админ-панель — LUSTRO{% endblock %}
+
+{% block content %}
+<div class="stats-4">
+    <div class="mc-panel">
+        <div class="stat-val">{{ users|length }}</div>
+        <div class="stat-lbl">Реальных юзеров в БД</div>
+    </div>
+    <div class="mc-panel">
+        <div class="stat-val">{{ total_downloads }}</div>
+        <div class="stat-lbl">Реальных скачиваний</div>
+    </div>
+    <div class="mc-panel">
+        <div class="stat-val">{{ builds|length }}</div>
+        <div class="stat-lbl">Загружено билдов</div>
+    </div>
+    <div class="mc-panel-gold">
+        <div class="stat-val">{{ subs_count }}</div>
+        <div class="stat-lbl">Активных подписок</div>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:24px;">
+    <!-- Загрузка билда -->
+    <section class="mc-panel-gold">
+        <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:16px;">ЗАЛИТЬ БИЛД КЛИЕНТА</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Версия (например: v2.4)</label>
+                <input type="text" name="version" class="mc-input" required placeholder="v2.4">
+            </div>
+            <div class="form-group">
+                <label>Версия Minecraft</label>
+                <input type="text" name="mc_version" class="mc-input" value="1.16.5 - 1.21.4">
+            </div>
+            <div class="form-group">
+                <label>Кому доступно скачивание</label>
+                <select name="min_plan" class="mc-input">
+                    <option value="free">Всем зарегистрированным (FREE)</option>
+                    <option value="plus">Только LUSTRO+ и выше</option>
+                    <option value="ultra">Только LUSTRO ULTRA и выше</option>
+                    <option value="lifetime">Только LIFETIME</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Список изменений (Changelog)</label>
+                <textarea name="changelog" rows="3" class="mc-input" placeholder="[+] Новый модуль&#10;[*] Фикс FPS"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Файл (.exe, .jar, .zip, .rar, .msi)</label>
+                <input type="file" name="client_file" class="mc-input" required>
+            </div>
+            <button type="submit" class="mc-btn mc-btn-gold">Опубликовать билд</button>
+        </form>
+    </section>
+
+    <!-- Ключи подписок + Пароль -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+        <section class="mc-panel">
+            <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:16px;">ГЕНЕРАТОР КЛЮЧЕЙ ПОДПИСКИ</h2>
+            <form method="POST" action="{{ url_for('create_key') }}">
+                <div class="grid-2" style="gap:12px;">
+                    <div class="form-group">
+                        <label>Тариф</label>
+                        <select name="plan" class="mc-input">
+                            <option value="plus">LUSTRO+</option>
+                            <option value="ultra">LUSTRO ULTRA</option>
+                            <option value="lifetime">LIFETIME</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Срок действия</label>
+                        <select name="days" class="mc-input">
+                            <option value="7">7 дней</option>
+                            <option value="30" selected>30 дней</option>
+                            <option value="90">90 дней</option>
+                            <option value="forever">Навсегда</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="mc-btn mc-btn-gold mc-btn-sm">Сгенерировать ключ</button>
+            </form>
+        </section>
+
+        <section class="mc-panel">
+            <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:16px;">СМЕНА ПАРОЛЯ АДМИНА</h2>
+            <form method="POST" action="{{ url_for('admin_change_password') }}">
+                <div class="form-group">
+                    <label>Текущий пароль</label>
+                    <input type="password" name="current_password" class="mc-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль (от 10 символов)</label>
+                    <input type="password" name="new_password" class="mc-input" required minlength="10">
+                </div>
+                <button type="submit" class="mc-btn mc-btn-stone mc-btn-sm">Обновить пароль</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+<!-- Управление пользователями и выдача подписок -->
+<section class="mc-panel" style="margin-bottom:24px;">
+    <div class="section-heading" style="margin-bottom:16px;">
+        <h2 style="font-size:14px;">ПОЛЬЗОВАТЕЛИ И ВЫДАЧА ПОДПИСОК</h2>
+        <form method="GET" style="display:flex; gap:8px;">
+            <input type="text" name="q" value="{{ search_q }}" class="mc-input" style="width:220px; padding:6px 10px;" placeholder="Поиск по нику/почте">
+            <button type="submit" class="mc-btn mc-btn-stone mc-btn-sm">Найти</button>
+        </form>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>Игрок / Email</th>
+                    <th>Подписка</th>
+                    <th>Выдать подписку вручную</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                {% set u_plan, u_until = get_active_plan(u) %}
+                <tr>
+                    <td class="mono">#{{ '%04d' % u.id }}</td>
+                    <td>
+                        <strong>{{ u.username }}</strong>
+                        {% if u.is_admin %}<span class="badge badge-gold">ADMIN</span>{% endif %}
+                        {% if u.is_banned %}<span class="badge badge-ban">BAN</span>{% endif %}
+                        <div class="mono" style="font-size:12px; color:var(--muted);">{{ u.email }} · {{ u.last_ip }}</div>
+                    </td>
+                    <td>
+                        <span class="badge" style="border-color:{{ SUBSCRIPTION_PLANS[u_plan].color }}; color:{{ SUBSCRIPTION_PLANS[u_plan].color }};">
+                            {{ SUBSCRIPTION_PLANS[u_plan].name }}
+                        </span>
+                        {% if u_until %}
+                            <div style="font-size:12px; color:var(--muted);">{{ u_until }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('grant_subscription', user_id=u.id) }}" style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <select name="plan" class="mc-input" style="width:auto; padding:5px 8px; font-size:13px;">
+                                <option value="free" {% if u_plan == 'free' %}selected{% endif %}>FREE (Снять)</option>
+                                <option value="plus" {% if u_plan == 'plus' %}selected{% endif %}>LUSTRO+</option>
+                                <option value="ultra" {% if u_plan == 'ultra' %}selected{% endif %}>ULTRA</option>
+                                <option value="lifetime" {% if u_plan == 'lifetime' %}selected{% endif %}>LIFETIME</option>
+                            </select>
+                            <select name="days" class="mc-input" style="width:auto; padding:5px 8px; font-size:13px;">
+                                <option value="7">7 дн.</option>
+                                <option value="30" selected>30 дн.</option>
+                                <option value="90">90 дн.</option>
+                                <option value="forever">Навсегда</option>
+                            </select>
+                            <button type="submit" class="mc-btn mc-btn-gold mc-btn-sm">Выдать</button>
+                        </form>
+                    </td>
+                    <td>
+                        {% if u.id != g.user.id %}
+                            <div style="display:flex; gap:6px;">
+                                <form method="POST" action="{{ url_for('toggle_ban', user_id=u.id) }}">
+                                    <button type="submit" class="mc-btn mc-btn-danger mc-btn-sm">
+                                        {{ 'Разбан' if u.is_banned else 'Бан' }}
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('toggle_role', user_id=u.id) }}">
+                                    <button type="submit" class="mc-btn mc-btn-stone mc-btn-sm">
+                                        {{ '-Адм' if u.is_admin else '+Адм' }}
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <span style="color:var(--muted); font-size:13px;">Это вы</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Ключи активации -->
+<section class="mc-panel" style="margin-bottom:24px;">
+    <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:14px;">КЛЮЧИ АКТИВАЦИИ</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ключ</th>
+                    <th>Тариф</th>
+                    <th>Срок</th>
+                    <th>Статус</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for k in keys %}
+                <tr>
+                    <td class="mono" style="color:var(--gold);">{{ k.code }}</td>
+                    <td>{{ SUBSCRIPTION_PLANS[k.plan].name }}</td>
+                    <td>{{ 'Навсегда' if k.duration_days == 0 else (k.duration_days ~ ' дн.') }}</td>
+                    <td>
+                        {% if k.used_by %}
+                            <span class="badge">Использован: {{ k.used_by }} ({{ k.used_at }})</span>
+                        {% else %}
+                            <span class="badge badge-green">Активен</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_key', key_id=k.id) }}">
+                            <button type="submit" class="mc-btn mc-btn-danger mc-btn-sm">✕</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="color:var(--muted);">Ключи ещё не создавались.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Загруженные билды -->
+<section class="mc-panel" style="margin-bottom:24px;">
+    <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:14px;">ЗАГРУЖЕННЫЕ БИЛДЫ</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Версия</th>
+                    <th>MC</th>
+                    <th>Доступ</th>
+                    <th>Размер</th>
+                    <th>Скачиваний</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in builds %}
+                <tr>
+                    <td><strong>{{ b.version }}</strong></td>
+                    <td>{{ b.mc_version }}</td>
+                    <td>{{ SUBSCRIPTION_PLANS[b.min_plan].name }}</td>
+                    <td>{{ b.file_size }}</td>
+                    <td>{{ b.downloads }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_build', build_id=b.id) }}" onsubmit="return confirm('Удалить билд?');">
+                            <button type="submit" class="mc-btn mc-btn-danger mc-btn-sm">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="color:var(--muted);">Билды пока не загружены.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Лог скачиваний -->
+<section class="mc-panel" style="margin-bottom:36px;">
+    <h2 class="pixel-title" style="font-size:14px; color:var(--gold); margin-bottom:14px;">ЛОГ СКАЧИВАНИЙ</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Игрок</th>
+                    <th>Версия</th>
+                    <th>IP</th>
+                    <th>Время</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in logs %}
+                <tr>
+                    <td><strong>{{ l.username }}</strong></td>
+                    <td>{{ l.build_version }}</td>
+                    <td class="mono">{{ l.ip_address }}</td>
+                    <td>{{ l.downloaded_at }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="color:var(--muted);">Скачиваний пока не было.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

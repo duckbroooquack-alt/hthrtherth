@@ -1,0 +1,736 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+
+:root {
+    --bg-bedrock: #0e0e11;
+    --bg-deepslate: #19191f;
+    --bg-panel: #222229;
+    --bg-slot: #131318;
+    --bevel-light: #3b3b47;
+    --bevel-dark: #0a0a0d;
+    --outline: #000000;
+
+    --gold: #facc15;
+    --gold-light: #fef08a;
+    --gold-mid: #eab308;
+    --gold-dark: #a16207;
+    --gold-deep: #713f12;
+
+    --xp-green: #80ff20;
+    --xp-dark: #2f5e0c;
+    --redstone: #ef4444;
+    --diamond: #38bdf8;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Текстура глубинного сланца (Deepslate) через inline SVG */
+body {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-bedrock);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' shape-rendering='crispEdges'%3E%3Crect width='64' height='64' fill='%23121216'/%3E%3Crect x='0' y='0' width='32' height='16' fill='%2317171d'/%3E%3Crect x='32' y='16' width='32' height='16' fill='%2317171d'/%3E%3Crect x='0' y='32' width='32' height='16' fill='%2315151b'/%3E%3Crect x='32' y='48' width='32' height='16' fill='%2315151b'/%3E%3Crect x='0' y='15' width='64' height='1' fill='%230c0c0f'/%3E%3Crect x='0' y='31' width='64' height='1' fill='%230c0c0f'/%3E%3Crect x='0' y='47' width='64' height='1' fill='%230c0c0f'/%3E%3Crect x='0' y='63' width='64' height='1' fill='%230c0c0f'/%3E%3Crect x='31' y='0' width='1' height='16' fill='%230c0c0f'/%3E%3Crect x='15' y='16' width='1' height='16' fill='%230c0c0f'/%3E%3Crect x='47' y='32' width='1' height='16' fill='%230c0c0f'/%3E%3Crect x='15' y='48' width='1' height='16' fill='%230c0c0f'/%3E%3Crect x='4' y='4' width='4' height='4' fill='%231d1d24'/%3E%3Crect x='40' y='20' width='4' height='4' fill='%231d1d24'/%3E%3Crect x='20' y='36' width='4' height='4' fill='%231d1d24'/%3E%3Crect x='52' y='52' width='4' height='4' fill='%231d1d24'/%3E%3C/svg%3E");
+    image-rendering: pixelated;
+}
+
+.pixel-title {
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.45;
+    text-shadow: 3px 3px 0 #000;
+}
+
+.mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.container {
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Minecraft-панель с 3D пиксельной рамкой */
+.mc-panel {
+    background: var(--bg-panel);
+    border-top: 3px solid var(--bevel-light);
+    border-left: 3px solid var(--bevel-light);
+    border-right: 3px solid var(--bevel-dark);
+    border-bottom: 3px solid var(--bevel-dark);
+    box-shadow: 0 0 0 3px var(--outline), 0 8px 0 rgba(0, 0, 0, 0.45);
+    padding: 24px;
+}
+
+.mc-panel-gold {
+    background: var(--bg-panel);
+    border-top: 3px solid var(--gold-light);
+    border-left: 3px solid var(--gold-light);
+    border-right: 3px solid var(--gold-dark);
+    border-bottom: 3px solid var(--gold-dark);
+    box-shadow: 0 0 0 3px var(--outline), 0 8px 0 rgba(0, 0, 0, 0.5);
+    padding: 24px;
+}
+
+/* Навигация (Hotbar) */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #141419;
+    border-bottom: 4px solid var(--gold-dark);
+    box-shadow: 0 4px 0 #000;
+}
+
+.nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 74px;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    text-shadow: 3px 3px 0 #000;
+}
+
+.logo span {
+    color: #fff;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nav-slot {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 14px;
+    background: var(--bg-slot);
+    border-top: 2px solid #09090b;
+    border-left: 2px solid #09090b;
+    border-right: 2px solid #32323c;
+    border-bottom: 2px solid #32323c;
+    transition: background 0.1s, color 0.1s;
+}
+
+.nav-slot:hover {
+    background: #25252e;
+    color: var(--gold);
+    border-color: var(--gold);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Minecraft кнопки */
+.mc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 11px 22px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 0 3px #000;
+    transition: transform 0.06s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mc-btn:active {
+    transform: translateY(2px);
+}
+
+.mc-btn-gold {
+    background: var(--gold);
+    color: #181002 !important;
+    border-top: 3px solid var(--gold-light);
+    border-left: 3px solid var(--gold-light);
+    border-right: 3px solid var(--gold-dark);
+    border-bottom: 3px solid var(--gold-dark);
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.mc-btn-gold:hover {
+    background: #fde047;
+}
+
+.mc-btn-stone {
+    background: #3f3f46;
+    color: #fff !important;
+    border-top: 3px solid #63636e;
+    border-left: 3px solid #63636e;
+    border-right: 3px solid #1f1f24;
+    border-bottom: 3px solid #1f1f24;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.mc-btn-stone:hover {
+    background: #52525b;
+    color: var(--gold) !important;
+}
+
+.mc-btn-danger {
+    background: #b91c1c;
+    color: #fff !important;
+    border-top: 3px solid #f87171;
+    border-left: 3px solid #f87171;
+    border-right: 3px solid #7f1d1d;
+    border-bottom: 3px solid #7f1d1d;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.mc-btn-danger:hover {
+    background: #dc2626;
+}
+
+.mc-btn-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.mc-btn-disabled {
+    background: #27272a;
+    color: #71717a !important;
+    border-top: 3px solid #3f3f46;
+    border-left: 3px solid #3f3f46;
+    border-right: 3px solid #18181b;
+    border-bottom: 3px solid #18181b;
+    cursor: not-allowed;
+}
+
+/* Флеш-уведомления (Minecraft Chat / Toast) */
+.alerts {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert {
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #141418;
+    border-left: 6px solid var(--gold);
+    box-shadow: 0 0 0 3px #000;
+}
+
+.alert-success { border-left-color: var(--xp-green); color: #bef264; }
+.alert-warning { border-left-color: var(--gold); color: var(--gold-light); }
+.alert-error { border-left-color: var(--redstone); color: #fca5a5; }
+
+/* HERO */
+.hero {
+    padding: 56px 0 44px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 32px;
+    align-items: start;
+}
+
+.mc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #141418;
+    border: 2px solid var(--gold-dark);
+    color: var(--gold);
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.hero h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.5;
+    margin-bottom: 18px;
+    text-shadow: 4px 4px 0 #000;
+}
+
+.hero h1 span {
+    color: var(--gold);
+}
+
+.hero-text {
+    color: var(--muted);
+    font-size: 18px;
+    margin-bottom: 26px;
+}
+
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+/* Статистика (Блоки) */
+.stats-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.stat-block {
+    background: var(--bg-slot);
+    border-top: 3px solid #09090b;
+    border-left: 3px solid #09090b;
+    border-right: 3px solid #32323c;
+    border-bottom: 3px solid #32323c;
+    padding: 14px;
+    text-align: center;
+}
+
+.stat-val {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 19px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 6px;
+}
+
+.stat-lbl {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* Minecraft Инвентарь Модулей */
+.inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #101014;
+}
+
+.inv-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.inv-slot {
+    background: var(--bg-slot);
+    border-top: 3px solid #08080a;
+    border-left: 3px solid #08080a;
+    border-right: 3px solid #3a3a45;
+    border-bottom: 3px solid #3a3a45;
+    padding: 12px 10px;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    position: relative;
+}
+
+.inv-slot:hover {
+    background: #252530;
+}
+
+.inv-slot.active {
+    background: #2c240c;
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 2px var(--gold-dark);
+}
+
+.inv-slot .slot-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 6px;
+}
+
+.inv-slot .slot-state {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.inv-slot.active .slot-state {
+    color: var(--xp-green);
+}
+
+/* Minecraft Item Tooltip */
+.mc-tooltip {
+    background: rgba(16, 0, 16, 0.96);
+    border: 3px solid #5000ff;
+    box-shadow: 0 0 0 3px #100010;
+    padding: 12px 14px;
+    min-height: 78px;
+}
+
+.mc-tooltip-title {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 16px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.mc-tooltip-lore {
+    color: #d4d4d8;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* Секции */
+.section {
+    margin: 48px 0;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.section-heading h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(16px, 2.2vw, 22px);
+    color: var(--gold);
+    text-shadow: 3px 3px 0 #000;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.feature-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.feature-head h3 {
+    font-size: 19px;
+    color: var(--gold-light);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.feature-desc {
+    color: var(--muted);
+    font-size: 16px;
+}
+
+/* XP-бар FPS сравнение */
+.xp-row {
+    margin-bottom: 18px;
+}
+
+.xp-meta {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.xp-bar {
+    height: 18px;
+    background: #0d0d10;
+    border: 3px solid #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    background-image: repeating-linear-gradient(
+        90deg,
+        var(--xp-green) 0px,
+        var(--xp-green) 14px,
+        var(--xp-dark) 14px,
+        var(--xp-dark) 16px
+    );
+}
+
+.xp-fill.gold {
+    background-image: repeating-linear-gradient(
+        90deg,
+        var(--gold) 0px,
+        var(--gold) 14px,
+        var(--gold-dark) 14px,
+        var(--gold-dark) 16px
+    );
+}
+
+.xp-fill.gray {
+    background-image: repeating-linear-gradient(
+        90deg,
+        #71717a 0px,
+        #71717a 14px,
+        #3f3f46 14px,
+        #3f3f46 16px
+    );
+}
+
+/* Тарифы подписок */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.plan-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.plan-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.plan-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 14px;
+}
+
+.plan-list {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.plan-list li {
+    font-size: 15px;
+    color: #d4d4d8;
+    padding: 5px 0;
+    border-bottom: 1px dashed #32323c;
+}
+
+.plan-list li::before {
+    content: '▪ ';
+    color: var(--gold);
+}
+
+.dev-banner {
+    background: #2b2108;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 0 3px #000;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 17px;
+}
+
+/* Формы, Капча, Почта */
+.auth-box {
+    max-width: 480px;
+    margin: 44px auto;
+}
+
+.tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+}
+
+.mc-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-slot);
+    color: #fff;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 16px;
+    border-top: 3px solid #08080a;
+    border-left: 3px solid #08080a;
+    border-right: 3px solid #3a3a45;
+    border-bottom: 3px solid #3a3a45;
+    outline: none;
+}
+
+.mc-input:focus {
+    border-color: var(--gold);
+}
+
+.captcha-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.captcha-img {
+    border: 3px solid #000;
+    cursor: pointer;
+    display: block;
+}
+
+.email-status {
+    font-size: 14px;
+    margin-top: 5px;
+    min-height: 20px;
+}
+
+.email-ok { color: var(--xp-green); }
+.email-bad { color: #f87171; }
+.email-wait { color: var(--gold); }
+
+/* Таблицы и Сетки */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.stats-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 26px 0;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 2px solid #141418;
+    vertical-align: middle;
+}
+
+th {
+    color: var(--gold);
+    background: #141418;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #141418;
+    border: 2px solid #3f3f46;
+}
+
+.badge-gold { border-color: var(--gold); color: var(--gold); }
+.badge-ban { border-color: var(--redstone); color: #fca5a5; }
+.badge-green { border-color: var(--xp-green); color: var(--xp-green); }
+
+/* FAQ */
+.faq-item {
+    margin-bottom: 12px;
+}
+
+.faq-btn {
+    width: 100%;
+    text-align: left;
+    background: var(--bg-slot);
+    color: #fff;
+    border: none;
+    padding: 14px 16px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.faq-ans {
+    display: none;
+    padding: 14px 16px;
+    color: var(--muted);
+    border-top: 2px solid #0e0e11;
+}
+
+.faq-item.open .faq-ans {
+    display: block;
+}
+
+footer {
+    margin-top: auto;
+    background: #101014;
+    border-top: 4px solid var(--gold-dark);
+    padding: 22px 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+@media (max-width: 980px) {
+    .hero, .grid-2, .features-grid { grid-template-columns: 1fr; }
+    .plans-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .plans-grid, .stats-strip { grid-template-columns: 1fr; }
+    .inv-grid { grid-template-columns: repeat(2, 1fr); }
+}

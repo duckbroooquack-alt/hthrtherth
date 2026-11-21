@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LUSTRO — Minecraft Client{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a href="{{ url_for('index') }}" class="logo">
+                <!-- Пиксельный золотой блок -->
+                <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <rect width="16" height="16" fill="#000"/>
+                    <rect x="1" y="1" width="14" height="14" fill="#eab308"/>
+                    <rect x="1" y="1" width="14" height="2" fill="#fef08a"/>
+                    <rect x="1" y="1" width="2" height="14" fill="#fef08a"/>
+                    <rect x="13" y="1" width="2" height="14" fill="#a16207"/>
+                    <rect x="1" y="13" width="14" height="2" fill="#a16207"/>
+                    <rect x="5" y="4" width="2" height="8" fill="#181002"/>
+                    <rect x="5" y="10" width="6" height="2" fill="#181002"/>
+                </svg>
+                LUSTRO<span>.MC</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('index') }}#features" class="nav-slot">Преимущества</a>
+                <a href="{{ url_for('index') }}#fps" class="nav-slot">FPS</a>
+                <a href="{{ url_for('subscriptions') }}" class="nav-slot">Подписки</a>
+                <a href="{{ url_for('index') }}#faq" class="nav-slot">FAQ</a>
+            </nav>
+
+            <div class="nav-actions">
+                {% if g.user %}
+                    {% if g.user.is_admin %}
+                        <a href="{{ url_for('admin') }}" class="mc-btn mc-btn-gold mc-btn-sm">Админка</a>
+                    {% endif %}
+                    <a href="{{ url_for('profile') }}" class="mc-btn mc-btn-stone mc-btn-sm">
+                        {{ g.user.username }}
+                        {% if g.plan != 'free' %}
+                            [{{ SUBSCRIPTION_PLANS[g.plan].name }}]
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="nav-slot">Выход</a>
+                {% else %}
+                    <a href="{{ url_for('auth', mode='login') }}" class="mc-btn mc-btn-stone mc-btn-sm">Вход</a>
+                    <a href="{{ url_for('auth', mode='register') }}" class="mc-btn mc-btn-gold mc-btn-sm">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alerts">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container footer-inner">
+            <div>© 2026 <strong>LUSTRO CLIENT</strong> · Все права защищены</div>
+            <div>Not an official Minecraft product. Not approved by Mojang or Microsoft.</div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
